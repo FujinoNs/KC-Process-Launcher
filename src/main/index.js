@@ -10,8 +10,10 @@ const dataPath = join(app.getPath('userData'), 'kc-launcher-data.json')
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1280,
+    height: 720,
+    minHeight:720,
+    minWidth:1280,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),

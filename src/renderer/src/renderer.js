@@ -61,7 +61,7 @@ $(document).ready(async () => {
         box-shadow: 0 10px 15px rgba(0,0,0,0.1);
       }
       [data-theme="dark"] .card:hover {
-        box-shadow: 0 10px 25px rgba(234, 51, 91, 0.3), 0 0 15px rgba(51, 78, 234, 0.2);
+        box-shadow: 0 10px 25px rgba(234, 51, 51, 0.3), 0 0 15px rgba(0, 81, 255, 0);
       }
       .btn {
         border-radius: 8px;
@@ -114,7 +114,6 @@ $(document).ready(async () => {
     </style>
   `)
 
-  // Theme Toggle Button
   $('body').append(`
     <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
       <button id="btnThemeToggle" class="btn btn-light-custom shadow-sm rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
@@ -150,7 +149,6 @@ $(document).ready(async () => {
 
   modalInstance = new bootstrap.Modal(document.getElementById('itemModal'))
 
-  // Logic สำหรับปุ่มเปลี่ยนธีม
   const toggleTheme = () => {
     const isDark = $('body').attr('data-theme') === 'dark'
     if (isDark) {
@@ -168,7 +166,6 @@ $(document).ready(async () => {
 
   $(document).on('click', '#btnThemeToggle', toggleTheme)
 
-  // ตรวจสอบธีมที่บันทึกไว้เมื่อโหลดโปรแกรม (Default Dark)
   if (localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme')) {
     $('body').attr('data-theme', 'dark')
     $('#iconSun').hide()
