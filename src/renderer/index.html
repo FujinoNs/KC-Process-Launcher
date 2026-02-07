@@ -6,37 +6,84 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:"
     />
 
-    <link href="./assets/main.css" type="text/css" rel="stylesheet" />
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body { background-color: #f8f9fa; padding: 20px; }
+      .card-actions { display: flex; gap: 5px; }
+      /* Fix: ป้องกันปัญหาพิมพ์ไม่ได้ใน Electron */
+      input.form-control {
+        -webkit-app-region: no-drag;
+        user-select: text;
+      }
+    </style>
   </head>
-
+ 
   <body>
-    <div id="app">
-      <img alt="logo" class="logo" src="./assets/electron.svg" />
-      <div class="creator">Powered by electron-vite</div>
-      <div class="text">
-        Build an Electron app with
-        <span class="js">JavaScript</span>
-      </div>
-      <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
-      <div class="actions">
-        <div class="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
-        </div>
-        <div class="action">
-          <a id="ipcHandler" target="_blank" rel="noreferrer">Send IPC</a>
-        </div>
+    <div class="container">
+      <!-- 1. หัวเรื่องและรายละเอียด -->
+      <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold">KC-Process-Launcher</h1>
+        <p class="lead text-muted">เครื่องมือจัดการไฟล์ขยะและเรียกใช้โปรแกรมอัตโนมัติ</p>
       </div>
 
-      <ul class="versions">
-        <li class="electron-version"></li>
-        <li class="chrome-version"></li>
-        <li class="node-version"></li>
-      </ul>
+      <!-- 2. ปุ่มเพิ่มรายการ -->
+      <div class="d-flex justify-content-center gap-2 mb-4">
+        <button id="btnAdd" class="btn btn-primary btn-lg shadow-sm">
+          <i class="bi bi-plus-circle"></i> + เพิ่มรายการใหม่
+        </button>
+        <button id="btnCleanTemp" class="btn btn-danger btn-lg shadow-sm">
+          ล้างไฟล์ขยะ (Temp)
+        </button>
+      </div>
+
+      <!-- 3. แสดงลิสเป็นรูปแบบ Card -->
+      <div id="cardContainer" class="row g-3">
+        <!-- Cards จะถูกสร้างด้วย JS ที่นี่ -->
+      </div>
     </div>
 
+    <!-- Modal Form -->
+    <div class="modal fade" id="itemModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">เพิ่มรายการ</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="itemForm">
+              <div class="mb-3">
+                <label for="inputName" class="form-label">ชื่อรายการ</label>
+                <input type="text" class="form-control" id="inputName" required placeholder="เช่น Google Chrome">
+              </div>
+              <div class="mb-3">
+                <label for="inputPath" class="form-label">Path หรือ URL</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="inputPath" required placeholder="C:\Program Files\... หรือ https://...">
+                  <button class="btn btn-outline-secondary" type="button" id="btnBrowse">เลือกไฟล์</button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="inputArgs" class="form-label">Argument (ถ้ามี)</label>
+                <input type="text" class="form-control" id="inputArgs" placeholder="เช่น --incognito">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+            <button type="button" class="btn btn-primary" id="btnSave">บันทึก</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/renderer.js"></script>
   </body>
 </html>

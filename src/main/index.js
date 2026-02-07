@@ -1,10 +1,14 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
+import { promises as fs } from 'fs'
+import os from 'os'
+import { exec } from 'child_process'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+const dataPath = join(app.getPath('userData'), 'kc-launcher-data.json')
+
 function createWindow() {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -26,8 +30,6 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -35,40 +37,92 @@ function createWindow() {
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  ipcMain.handle('clean-temp', async () => {
+    const tempDir = os.tmpdir()
+    const log = { deleted: 0, errors: [] }
+    try {
+      const files = await fs.readdir(tempDir)
+      for (const file of files) {
+        try {
+          await fs.rm(join(tempDir, file), { recursive: true, force: true })
+          log.deleted++
+        } catch (err) {
+          log.errors.push({ file, error: err.message })
+        }
+      }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
+    return { success: true, ...log }
+  })
+
+  ipcMain.handle('get-items', async () => {
+    try {
+      const data = await fs.readFile(dataPath, 'utf-8')
+      return JSON.parse(data)
+    } catch (error) {
+      return []
+    }
+  })
+
+  ipcMain.handle('save-items', async (_, items) => {
+    try {
+      await fs.writeFile(dataPath, JSON.stringify(items, null, 2))
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  })
+
+  ipcMain.handle('open-file-dialog', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ['openFile']
+    })
+    if (canceled) {
+      return null
+    }
+    return filePaths[0]
+  })
+
+  ipcMain.handle('launch-process', async (_, payload) => {
+    const target = typeof payload === 'object' ? payload.path : payload
+    const args = (typeof payload === 'object' && payload.args) ? payload.args : ''
+
+    if (target.startsWith('http://') || target.startsWith('https://')) {
+      await shell.openExternal(target)
+      return { success: true, type: 'url' }
+    }
+
+    if (args) {
+      exec(`"${target}" ${args}`)
+      return { success: true, type: 'command' }
+    }
+
+    const err = await shell.openPath(target)
+    if (err) {
+      return { success: false, error: err }
+    }
+    return { success: true, type: 'path' }
+  })
 
   createWindow()
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
