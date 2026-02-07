@@ -1,10 +1,10 @@
 {
   "name": "kc-process-launcher",
   "version": "1.0.0",
-  "description": "A minimal Electron application with JavaScript",
+  "description": "KC-Process-Launcher is a program that deletes Windows temporary files and runs files/links or processes.",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "github.com/FujinoNs/",
+  "homepage": "https://github.com/FujinoNs/KC-Process-Launcher",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

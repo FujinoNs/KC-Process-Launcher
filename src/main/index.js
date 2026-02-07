@@ -16,6 +16,8 @@ function createWindow() {
     minWidth:1280,
     show: false,
     autoHideMenuBar: true,
+    icon: icon,
+    name: 'KC Process Launcher',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -114,6 +116,17 @@ app.whenReady().then(() => {
       return { success: false, error: err }
     }
     return { success: true, type: 'path' }
+  })
+
+  ipcMain.handle('close-app', () => {
+    app.quit()
+  })
+
+  ipcMain.handle('minimize-app', () => {
+    const windows = BrowserWindow.getAllWindows()
+    for (const window of windows) {
+      window.minimize()
+    }
   })
 
   createWindow()

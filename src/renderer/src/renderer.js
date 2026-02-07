@@ -244,8 +244,8 @@ function renderItems() {
     const typeColor = isUrl ? '#2563eb' : '#db2777'
     const typeBg = isUrl ? '#dbeafe' : '#fce7f3'
     const typeText = isUrl ? 'WEBSITE' : 'APPLICATION'
-    
-    const iconSvg = isUrl 
+
+    const iconSvg = isUrl
       ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="${typeColor}" class="bi bi-globe" viewBox="0 0 16 16"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5V1.077zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4H4.09zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.958 6.958 0 0 0-.656 2.5h2.49zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5H4.847zM8.5 5v2.5h2.99a12.495 12.495 0 0 0-.337-2.5H8.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5H4.51zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5H8.5zM5.145 12c.138.592.325 1.052.561 1.333C6.258 13.89 6.874 14.5 7.5 14.923V12H5.145zm8.5-7.923v2.923h2.355a7.967 7.967 0 0 0-1.76-2.355 5.484 5.484 0 0 0-.595-.568zM1.674 11a6.957 6.957 0 0 0 .656 2.5h2.141c-.174-.782-.282-1.623-.312-2.5H1.674zm11.774-2.5a12.499 12.499 0 0 0-.338-2.5H10.5v2.5h2.948zm-2.948 3.5h2.653a12.5 12.5 0 0 0 .338-2.5H10.5v2.5zm-1.005 2.923V12h2.355a7.967 7.967 0 0 0 1.76-2.355 5.484 5.484 0 0 0 .595-.568z"/></svg>`
       : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="${typeColor}" class="bi bi-window" viewBox="0 0 16 16"><path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/><path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM1 13V6h14v7a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1z"/></svg>`
 
@@ -292,7 +292,13 @@ window.runItem = async (index) => {
     showToast(`ลบไฟล์ขยะไป ${result.deleted} ไฟล์`)
   }
   window.electron.ipcRenderer.invoke('launch-process', item)
+  window.electron.ipcRenderer.invoke('minimize-app')
+  setTimeout(() => {
+    showToast(`กำลังเปิดใช้งาน: ${item.name}`)
+    window.electron.ipcRenderer.invoke('close-app')
+  }, 5000)
 }
+
 
 window.editItem = (index) => {
   editIndex = index
