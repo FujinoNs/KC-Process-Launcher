@@ -1,6 +1,6 @@
 {
   "name": "kc-process-launcher",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "KC-Process-Launcher is a program that deletes Windows temporary files and runs files/links or processes.",
   "main": "./out/main/index.js",
   "author": "github.com/FujinoNs/",
