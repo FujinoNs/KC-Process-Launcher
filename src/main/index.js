@@ -101,7 +101,7 @@ app.whenReady().then(() => {
     const target = typeof payload === 'object' ? payload.path : payload
     const args = (typeof payload === 'object' && payload.args) ? payload.args : ''
 
-    if (target.startsWith('http://') || target.startsWith('https://')) {
+    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(target)) {
       await shell.openExternal(target)
       return { success: true, type: 'url' }
     }
